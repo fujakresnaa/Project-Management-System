@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/Header"
 import Dashboard from "@/components/Dashboard"
@@ -10,6 +11,7 @@ import FilesView from "@/components/FilesView" // Import FilesView component
 import CalendarView from "@/components/CalendarView" // Import CalendarView component
 import ExportManager from "@/components/ExportManager"
 import BulkExportManager from "@/components/BulkExportManager"
+import AIChat from "@/components/AIChat"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -348,6 +350,7 @@ export default function AvenciaApp() {
   const [exportType, setExportType] = useState<
     "projects" | "tasks" | "team" | "files" | "calendar" | "analytics" | "workspace"
   >("projects")
+  const [showAIChat, setShowAIChat] = useState(false)
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
@@ -550,16 +553,33 @@ export default function AvenciaApp() {
         onExport={handleBulkExport}
       />
 
-      {/* Floating Export Button */}
-      <div className="fixed bottom-6 right-6 z-30">
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
+        <Button
+          onClick={() => setShowAIChat(true)}
+          className="gradient-primary text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-full w-14 h-14 p-0"
+          title="AI Assistant"
+        >
+          <span className="text-xl">🤖</span>
+        </Button>
         <Button
           onClick={() => setShowBulkExportManager(true)}
-          className="gradient-primary text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-full w-14 h-14 p-0"
+          className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-full w-14 h-14 p-0"
           title="Bulk Export Workspace"
         >
           <span className="text-xl">📤</span>
         </Button>
       </div>
+
+      {/* AI Chat Dialog */}
+      <AIChat
+        isOpen={showAIChat}
+        onClose={() => setShowAIChat(false)}
+        currentView={currentView}
+        userData={userSettings}
+        files={files}
+        calendarEvents={calendarEvents}
+      />
     </div>
   )
 }
@@ -641,9 +661,11 @@ function SettingsView({
                 {/* Avatar Section */}
                 <div className="flex items-center gap-6">
                   <div className="relative">
-                    <img
+                    <Image
                       src={settings.profile.avatar || "/placeholder.svg"}
                       alt="Profile"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 rounded-full object-cover border-2 border-white/20"
                     />
                     <Button size="sm" className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 gradient-primary">
